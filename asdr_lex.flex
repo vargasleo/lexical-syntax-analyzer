@@ -25,12 +25,15 @@ WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
 "while"	 	{ return AsdrSample.WHILE; }
 "if"		{ return AsdrSample.IF; }
 "else"		{ return AsdrSample.ELSE; }
-"fi"		{ return AsdrSample.FI; }
 "int"       { return AsdrSample.INT; }
 "double"    { return AsdrSample.DOUBLE; }
 "boolean"   { return AsdrSample.BOOLEAN; }
 "func"      { return AsdrSample.FUNC; }
 "void"      { return AsdrSample.VOID; }
+","         { return ','; }
+"-"         { return '-'; }
+"*"         { return '*'; }
+"/"         { return '/'; }
 
 [:jletter:][:jletterdigit:]* { return AsdrSample.IDENT; }  
 
@@ -42,7 +45,15 @@ WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
 "(" |
 ")" |
 "+" |
-"="    	{ return yytext().charAt(0); } 
+"=" |
+"," |
+"-" |
+"*" |
+"/"       { return yytext().charAt(0); }
+
+{WHITE_SPACE_CHAR}+ { }
+
+. { System.out.println("Erro lexico: caracter invalido: <" + yytext() + ">"); }
 
 
 {WHITE_SPACE_CHAR}+ { }
