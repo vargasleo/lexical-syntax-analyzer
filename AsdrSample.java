@@ -44,56 +44,48 @@ public class AsdrSample {
     }
 
     private void Prog() {
-        if (debug) {
-            System.out.println("Prog --> ListaDecl");
-        }
+        debug("Prog --> ListaDecl");
 
         ListaDecl();
     }
 
     private void ListaDecl() {
         if (laToken == FUNC) {
-            if (debug) {
-                System.out.println("ListaDecl --> DeclFun ListaDecl");
-            }
+            debug("ListaDecl --> DeclFun ListaDecl");
 
             DeclFun();
             ListaDecl();
         } else if (laToken == Yylex.YYEOF) {
-            if (debug) {
-                System.out.println("ListaDecl --> vazio");
-            }
+            debug("ListaDecl --> vazio");
         } else {
-            if (debug) {
-                System.out.println("ListaDecl --> DeclVar ListaDecl");
-            }
+            debug("ListaDecl --> DeclVar ListaDecl");
 
             DeclVar();
             ListaDecl();
         }
     }
 
+    private void debug(String x) {
+        if (debug) {
+            System.out.println(x);
+        }
+    }
+
     private void DeclVar() {
         if ((laToken == INT) || (laToken == DOUBLE) || (laToken == BOOLEAN)) {
-            if (debug) {
-                System.out.println("DeclVar --> Tipo ListaIdent ';'");
-            }
+            debug("DeclVar --> Tipo ListaIdent ';'");
 
             Tipo();
             ListaIdent();
             verifica(';');
         } else {
-            if (debug) {
-                System.out.println("DeclVar --> vazio");
-            }
+            debug("DeclVar --> vazio");
         }
     }
 
     private void DeclFun() {
         if (laToken == FUNC) {
-            if (debug) {
-                System.out.println("DeclFun --> FUNC tipoOuVoid IDENT '(' FormalPar ')' '{' DeclVar ListaCmd '}'");
-            }
+            debug("DeclFun --> FUNC tipoOuVoid IDENT '(' FormalPar ')' '{' DeclVar ListaCmd '}'");
 
             verifica(FUNC);
             TipoOuVoid();
@@ -106,23 +98,17 @@ public class AsdrSample {
             ListaCmd();
             verifica('}');
         } else {
-            if (debug) {
-                System.out.println("DeclFun --> vazio");
-            }
+            debug("DeclFun --> vazio");
         }
     }
 
     private void TipoOuVoid() {
         if (laToken == VOID) {
-            if (debug) {
-                System.out.println("TipoOuVoid --> VOID");
-            }
+            debug("TipoOuVoid --> VOID");
 
             verifica(VOID);
         } else {
-            if (debug) {
-                System.out.println("TipoOuVoid --> Tipo");
-            }
+            debug("TipoOuVoid --> Tipo");
 
             Tipo();
         }
@@ -130,21 +116,15 @@ public class AsdrSample {
 
     private void Tipo() {
         if (laToken == INT) {
-            if (debug) {
-                System.out.println("Tipo --> int");
-            }
+            debug("Tipo --> int");
 
             verifica(INT);
         } else if (laToken == DOUBLE) {
-            if (debug) {
-                System.out.println("Tipo --> double");
-            }
+            debug("Tipo --> double");
 
             verifica(DOUBLE);
         } else if (laToken == BOOLEAN) {
-            if (debug) {
-                System.out.println("Tipo --> boolean");
-            }
+            debug("Tipo --> boolean");
 
             verifica(BOOLEAN);
         }
@@ -152,13 +132,9 @@ public class AsdrSample {
 
     private void FormalPar() {
         if (laToken == ')') {
-            if (debug) {
-                System.out.println("FormalPar -> vazio");
-            }
+            debug("FormalPar -> vazio");
         } else {
-            if (debug) {
-                System.out.println("FormalPar -> ParamList");
-            }
+            debug("FormalPar -> ParamList");
             ParamList();
         }
     }
@@ -168,16 +144,12 @@ public class AsdrSample {
         verifica(IDENT);
 
         if (laToken == ',') {
-            if (debug) {
-                System.out.println("ParamList -> Tipo IDENT , ParamList");
-            }
+            debug("ParamList -> Tipo IDENT , ParamList");
 
             verifica(',');
             ParamList();
         } else {
-            if (debug) {
-                System.out.println("ParamList -> Tipo IDENT");
-            }
+            debug("ParamList -> Tipo IDENT");
         }
     }
 
@@ -185,23 +157,17 @@ public class AsdrSample {
         verifica(IDENT);
 
         if (laToken == ',') {
-            if (debug) {
-                System.out.println("ListaIdent --> IDENT , ListaIdent");
-            }
+            debug("ListaIdent --> IDENT , ListaIdent");
 
             verifica(',');
             ListaIdent();
         } else {
-            if (debug) {
-                System.out.println("ListaIdent --> IDENT");
-            }
+            debug("ListaIdent --> IDENT");
         }
     }
 
     private void Bloco() {
-        if (debug) {
-            System.out.println("Bloco --> { Cmd }");
-        }
+        debug("Bloco --> { Cmd }");
 
         verifica('{');
         ListaCmd();
@@ -210,30 +176,22 @@ public class AsdrSample {
 
     private void ListaCmd() {
         if ((laToken == '{') || (laToken == WHILE) || (laToken == IDENT) || (laToken == IF)) {
-            if (debug) {
-                System.out.println("ListaCmd --> Cmd ListaCmd");
-            }
+            debug("ListaCmd --> Cmd ListaCmd");
 
             Cmd();
             ListaCmd();
         } else {
-            if (debug) {
-                System.out.println("ListaCmd --> vazio");
-            }
+            debug("ListaCmd --> vazio");
         }
     }
 
     private void Cmd() {
         if (laToken == '{') {
-            if (debug) {
-                System.out.println("Cmd --> Bloco");
-            }
+            debug("Cmd --> Bloco");
 
             Bloco();
         } else if (laToken == WHILE) {
-            if (debug) {
-                System.out.println("Cmd --> WHILE ( E ) Cmd");
-            }
+            debug("Cmd --> WHILE ( E ) Cmd");
 
             verifica(WHILE); // laToken = this.yylex();
             verifica('(');
@@ -241,18 +199,14 @@ public class AsdrSample {
             verifica(')');
             Cmd();
         } else if (laToken == IDENT) {
-            if (debug) {
-                System.out.println("Cmd --> IDENT = E ;");
-            }
+            debug("Cmd --> IDENT = E ;");
 
             verifica(IDENT);
             verifica('=');
             E();
             verifica(';');
         } else if (laToken == IF) {
-            if (debug) {
-                System.out.println("Cmd --> if (E) Cmd RestoIF");
-            }
+            debug("Cmd --> if (E) Cmd RestoIF");
 
             verifica(IF);
             verifica('(');
@@ -267,40 +221,30 @@ public class AsdrSample {
 
     private void RestoIF() {
         if (laToken == ELSE) {
-            if (debug) {
-                System.out.println("RestoIF --> else Cmd");
-            }
+            debug("RestoIF --> else Cmd");
 
             verifica(ELSE);
             Cmd();
         } else {
-            if (debug) {
-                System.out.println("RestoIF --> vazio");
-            }
+            debug("RestoIF --> vazio");
         }
     }
 
     private void E() {
         if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
-            if (debug) {
-                System.out.println("E --> T");
-            }
+            debug("E --> T");
 
             T();
         } else {
             E();
 
             if (laToken == '+') {
-                if (debug) {
-                    System.out.println("E --> E + T");
-                }
+                debug("E --> E + T");
 
                 verifica('+');
                 T();
             } else if (laToken == '-') {
-                if (debug) {
-                    System.out.println("E --> E - T");
-                }
+                debug("E --> E - T");
 
                 verifica('-');
                 T();
@@ -310,25 +254,19 @@ public class AsdrSample {
 
     private void T() {
         if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
-            if (debug) {
-                System.out.println("T --> F");
-            }
+            debug("T --> F");
 
             F();
         } else {
             T();
 
             if (laToken == '*') {
-                if (debug) {
-                    System.out.println("T --> T * F");
-                }
+                debug("T --> T * F");
 
                 verifica('*');
                 F();
             } else if (laToken == '/') {
-                if (debug) {
-                    System.out.println("T --> T / F");
-                }
+                debug("T --> T / F");
 
                 verifica('/');
                 F();
@@ -338,21 +276,15 @@ public class AsdrSample {
 
     private void F() {
         if (laToken == IDENT) {
-            if (debug) {
-                System.out.println("F --> IDENT");
-            }
+            debug("F --> IDENT");
 
             verifica(IDENT);
         } else if (laToken == NUM) {
-            if (debug) {
-                System.out.println("F --> NUM");
-            }
+            debug("F --> NUM");
 
             verifica(NUM);
         } else if (laToken == '(') {
-            if (debug) {
-                System.out.println("F --> ( E )");
-            }
+            debug("F --> ( E )");
 
             verifica('(');
             E();
