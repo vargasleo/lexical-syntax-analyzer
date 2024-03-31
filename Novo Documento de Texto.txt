@@ -1,0 +1,5 @@
+"int"       { return SyntaxAnalyzer.INT; }
+"double"    { return SyntaxAnalyzer.DOUBLE; }
+"boolean"   { return SyntaxAnalyzer.BOOLEAN; }
+"func"      { return SyntaxAnalyzer.FUNC; }
+"void"      { return SyntaxAnalyzer.VOID; }
