@@ -1,0 +1,8 @@
+
+func double fat(int n) {
+    while ( (n) ) {
+        fat = fat * n;
+        n = n - 1;
+        if (n) { while (ok) x = break; }
+    }
+}

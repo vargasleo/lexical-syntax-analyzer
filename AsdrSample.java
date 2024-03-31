@@ -17,7 +17,7 @@ public class AsdrSample {
     public static final int BOOLEAN = 309;
     public static final int VOID = 310;
 
-    public static final String tokenList[] = {
+    public static final String[] tokenList = {
             "IDENT",
             "NUM",
             "WHILE",
@@ -31,9 +31,7 @@ public class AsdrSample {
     };
 
     /* referencia ao objeto Scanner gerado pelo JFLEX */
-    private Yylex lexer;
-
-    public Parser yylval;
+    private final Yylex lexer;
 
     private static int laToken;
     private boolean debug;
@@ -52,7 +50,6 @@ public class AsdrSample {
     private void ListaDecl() {
         if (laToken == FUNC) {
             debug("ListaDecl --> DeclFun ListaDecl");
-
             DeclFun();
             ListaDecl();
         } else if (laToken == Yylex.YYEOF) {
@@ -77,7 +74,7 @@ public class AsdrSample {
 
             Tipo();
             ListaIdent();
-            verifica(';');
+            check(';');
         } else {
             debug("DeclVar --> vazio");
         }
@@ -87,16 +84,16 @@ public class AsdrSample {
         if (laToken == FUNC) {
             debug("DeclFun --> FUNC tipoOuVoid IDENT '(' FormalPar ')' '{' DeclVar ListaCmd '}'");
 
-            verifica(FUNC);
+            check(FUNC);
             TipoOuVoid();
-            verifica(IDENT);
-            verifica('(');
+            check(IDENT);
+            check('(');
             FormalPar();
-            verifica(')');
-            verifica('{');
+            check(')');
+            check('{');
             DeclVar();
             ListaCmd();
-            verifica('}');
+            check('}');
         } else {
             debug("DeclFun --> vazio");
         }
@@ -106,7 +103,7 @@ public class AsdrSample {
         if (laToken == VOID) {
             debug("TipoOuVoid --> VOID");
 
-            verifica(VOID);
+            check(VOID);
         } else {
             debug("TipoOuVoid --> Tipo");
 
@@ -118,15 +115,15 @@ public class AsdrSample {
         if (laToken == INT) {
             debug("Tipo --> int");
 
-            verifica(INT);
+            check(INT);
         } else if (laToken == DOUBLE) {
             debug("Tipo --> double");
 
-            verifica(DOUBLE);
+            check(DOUBLE);
         } else if (laToken == BOOLEAN) {
             debug("Tipo --> boolean");
 
-            verifica(BOOLEAN);
+            check(BOOLEAN);
         }
     }
 
@@ -141,12 +138,12 @@ public class AsdrSample {
 
     private void ParamList() {
         Tipo();
-        verifica(IDENT);
+        check(IDENT);
 
         if (laToken == ',') {
             debug("ParamList -> Tipo IDENT , ParamList");
 
-            verifica(',');
+            check(',');
             ParamList();
         } else {
             debug("ParamList -> Tipo IDENT");
@@ -154,12 +151,12 @@ public class AsdrSample {
     }
 
     private void ListaIdent() {
-        verifica(IDENT);
+        check(IDENT);
 
         if (laToken == ',') {
             debug("ListaIdent --> IDENT , ListaIdent");
 
-            verifica(',');
+            check(',');
             ListaIdent();
         } else {
             debug("ListaIdent --> IDENT");
@@ -169,9 +166,9 @@ public class AsdrSample {
     private void Bloco() {
         debug("Bloco --> { Cmd }");
 
-        verifica('{');
+        check('{');
         ListaCmd();
-        verifica('}');
+        check('}');
     }
 
     private void ListaCmd() {
@@ -193,29 +190,29 @@ public class AsdrSample {
         } else if (laToken == WHILE) {
             debug("Cmd --> WHILE ( E ) Cmd");
 
-            verifica(WHILE); // laToken = this.yylex();
-            verifica('(');
+            check(WHILE); // laToken = this.yylex();
+            check('(');
             E();
-            verifica(')');
+            check(')');
             Cmd();
         } else if (laToken == IDENT) {
             debug("Cmd --> IDENT = E ;");
 
-            verifica(IDENT);
-            verifica('=');
+            check(IDENT);
+            check('=');
             E();
-            verifica(';');
+            check(';');
         } else if (laToken == IF) {
             debug("Cmd --> if (E) Cmd RestoIF");
 
-            verifica(IF);
-            verifica('(');
+            check(IF);
+            check('(');
             E();
-            verifica(')');
+            check(')');
             Cmd();
             RestoIF();
         } else {
-            yyerror("Esperado {, if, while ou identificador");
+            yyError("Esperado {, if, while ou identificador");
         }
     }
 
@@ -223,7 +220,7 @@ public class AsdrSample {
         if (laToken == ELSE) {
             debug("RestoIF --> else Cmd");
 
-            verifica(ELSE);
+            check(ELSE);
             Cmd();
         } else {
             debug("RestoIF --> vazio");
@@ -231,72 +228,46 @@ public class AsdrSample {
     }
 
     private void E() {
-        if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
-            debug("E --> T");
-
-            T();
-        } else {
-            E();
-
+        T();
+        while (laToken == '+' || laToken == '-') {
             if (laToken == '+') {
-                debug("E --> E + T");
-
-                verifica('+');
+                check('+');
                 T();
-            } else if (laToken == '-') {
-                debug("E --> E - T");
-
-                verifica('-');
+            } else {
+                check('-');
                 T();
             }
         }
     }
 
     private void T() {
-        if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
-            debug("T --> F");
-
-            F();
-        } else {
-            T();
-
+        F();
+        while (laToken == '*' || laToken == '/') {
             if (laToken == '*') {
-                debug("T --> T * F");
-
-                verifica('*');
+                check('*');
                 F();
-            } else if (laToken == '/') {
-                debug("T --> T / F");
-
-                verifica('/');
+            } else {
+                check('/');
                 F();
             }
         }
     }
 
     private void F() {
-        if (laToken == IDENT) {
-            debug("F --> IDENT");
-
-            verifica(IDENT);
-        } else if (laToken == NUM) {
-            debug("F --> NUM");
-
-            verifica(NUM);
+        if (laToken == IDENT || laToken == NUM) {
+            check(laToken);
         } else if (laToken == '(') {
-            debug("F --> ( E )");
-
-            verifica('(');
+            check('(');
             E();
-            verifica(')');
+            check(')');
         } else {
-            yyerror("Esperado operando (, identificador ou numero");
+            yyError("Expected '(', or ,Identifier or Number");
         }
     }
 
-    private void verifica(int expected) {
+    private void check(int expected) {
         if (laToken == expected) {
-            laToken = this.yylex();
+            laToken = this.yyLex();
         } else {
             String expStr, laStr;
 
@@ -304,28 +275,24 @@ public class AsdrSample {
 
             laStr = ((laToken < BASE_TOKEN_NUM) ? Character.toString(laToken) : tokenList[laToken - BASE_TOKEN_NUM]);
 
-            yyerror("esperado token: " + expStr + " na entrada: " + laStr);
+            yyError("Expected: '" + expStr + "', actual: '" + laStr + "'.");
         }
     }
 
-    /* metodo de acesso ao Scanner gerado pelo JFLEX */
-    private int yylex() {
+    private int yyLex() {
         int retVal = -1;
         try {
-            yylval = new Parser(0); //zera o valor do token
-            retVal = lexer.yylex(); //le a entrada do arquivo e retorna um token
+            retVal = lexer.yylex();
         } catch (IOException e) {
-            System.err.println("IO Error:" + e);
+            System.err.println("IO Error: " + e);
         }
-
-        return retVal; //retorna o token para o Parser
+        return retVal;
     }
 
-    /* metodo de manipulacao de erros de sintaxe */
-    public void yyerror(String error) {
-        System.err.println("Erro: " + error);
-        System.err.println("Entrada rejeitada");
-        System.out.println("\n\nFalhou!!!");
+    public void yyError(String error) {
+        System.err.println("Error: " + error);
+        System.err.println("Entry rejected");
+        System.out.println("\n\nFAILED!");
 
         System.exit(1);
     }
@@ -341,11 +308,10 @@ public class AsdrSample {
      * It prints debugging information about each returned token to
      * System.out until the end of file is reached, or an error occured.
      *
-     * @param args the command line, contains the filenames to run
-     *             the scanner on.
+     * @param args the command line, contains the filenames to run the scanner on.
      */
     public static void main(String[] args) {
-        AsdrSample parser = null;
+        AsdrSample parser;
         try {
             if (args.length == 0) {
                 parser = new AsdrSample(new InputStreamReader(System.in));
@@ -354,17 +320,17 @@ public class AsdrSample {
             }
 
             parser.setDebug(true);
-            laToken = parser.yylex();
+            laToken = parser.yyLex();
 
             parser.Prog();
 
             if (laToken == Yylex.YYEOF) {
-                System.out.println("\n\nSucesso!");
+                System.out.println("\n\nSUCCESS!");
             } else {
-                System.out.println("\n\nFalhou - esperado EOF.");
+                System.out.println("\n\nFAILED - Expected EOF");
             }
         } catch (java.io.FileNotFoundException e) {
-            System.out.println("File not found : \"" + args[0] + "\"");
+            System.out.println("File not found: \"" + args[0] + "\"");
         }
     }
 }

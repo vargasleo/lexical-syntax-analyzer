@@ -1,0 +1,26 @@
+int i,j;
+
+func int foo(int i, int j) {
+    double res;
+    res = fat(i) / (fat(i-j)j
+    
+}
+
+int i, j;
+
+func void src.main() {
+    boolean ok;
+
+
+    res = fat(ok, i);
+}
+
+func double fat(int n) {
+    while ( (n) ) {
+        fat = fat * n;
+        n = n - 1;
+        if (n) { ok = break; }
+    }
+}
+
+boolean fim, ok;
