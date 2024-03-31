@@ -2,17 +2,17 @@ int i,j;
 
 func int foo(int i, int j) {
     double res;
-    res = fat(i) / (fat(i-j))
+    res = 4 / (2 * 1);
     
 }
 
 int i, j;
 
-func void src.main() {
+func void main() {
     boolean ok;
 
 
-    res = fat(ok, i);
+    res = ok;
 }
 
 func double fat(int n) {

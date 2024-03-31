@@ -1,3 +1,5 @@
+// Leonardo Vargas, Lorenzo Windmoller, Osmar Sadi
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -17,7 +19,7 @@ public class AsdrSample {
     public static final int BOOLEAN = 309;
     public static final int VOID = 310;
 
-    public static final String[] tokenList = {
+    public static final String tokenList[] = {
             "IDENT",
             "NUM",
             "WHILE",
@@ -30,19 +32,22 @@ public class AsdrSample {
             "VOID",
     };
 
-    /* referencia ao objeto Scanner gerado pelo JFLEX */
     private final Yylex lexer;
-
     private static int laToken;
     private boolean debug;
 
-    /* construtor da classe */
     public AsdrSample(Reader r) {
         lexer = new Yylex(r, this);
     }
 
+    private void debug(String message) {
+        if (debug) {
+            System.out.println(message);
+        }
+    }
+
     private void Prog() {
-        debug("Prog --> ListaDecl");
+        System.out.println("Prog --> ListaDecl");
 
         ListaDecl();
     }
@@ -50,6 +55,7 @@ public class AsdrSample {
     private void ListaDecl() {
         if (laToken == FUNC) {
             debug("ListaDecl --> DeclFun ListaDecl");
+
             DeclFun();
             ListaDecl();
         } else if (laToken == Yylex.YYEOF) {
@@ -59,12 +65,6 @@ public class AsdrSample {
 
             DeclVar();
             ListaDecl();
-        }
-    }
-
-    private void debug(String x) {
-        if (debug) {
-            System.out.println(x);
         }
     }
 
@@ -124,6 +124,8 @@ public class AsdrSample {
             debug("Tipo --> boolean");
 
             check(BOOLEAN);
+        } else {
+            yyError("Esperado int, double ou boolean");
         }
     }
 
@@ -132,6 +134,7 @@ public class AsdrSample {
             debug("FormalPar -> vazio");
         } else {
             debug("FormalPar -> ParamList");
+
             ParamList();
         }
     }
@@ -190,7 +193,7 @@ public class AsdrSample {
         } else if (laToken == WHILE) {
             debug("Cmd --> WHILE ( E ) Cmd");
 
-            check(WHILE); // laToken = this.yylex();
+            check(WHILE);
             check('(');
             E();
             check(')');
@@ -212,7 +215,7 @@ public class AsdrSample {
             Cmd();
             RestoIF();
         } else {
-            yyError("Esperado {, if, while ou identificador");
+            yyError("Expected: '{', 'if', 'while' or identifier");
         }
     }
 
@@ -228,40 +231,70 @@ public class AsdrSample {
     }
 
     private void E() {
-        T();
-        while (laToken == '+' || laToken == '-') {
-            if (laToken == '+') {
-                check('+');
-                T();
+        if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
+            T();
+
+            if ((laToken == '+') || (laToken == '-')) {
+                if (laToken == '+') {
+                    debug("E --> E + T");
+
+                    check('+');
+                    T();
+                } else if (laToken == '-') {
+                    debug("E --> E - T");
+
+                    check('-');
+                    T();
+                }
             } else {
-                check('-');
-                T();
+                debug("E --> T");
             }
+        } else {
+            yyError("Expected: '(', identifier or number");
         }
     }
 
     private void T() {
-        F();
-        while (laToken == '*' || laToken == '/') {
-            if (laToken == '*') {
-                check('*');
-                F();
+        if ((laToken == IDENT) || (laToken == NUM) || (laToken == '(')) {
+            F();
+
+            if ((laToken == '*') || (laToken == '/')) {
+                if (laToken == '*') {
+                    debug("T --> T * F");
+
+                    check('*');
+                    F();
+                } else if (laToken == '/') {
+                    debug("T --> T / F");
+
+                    check('/');
+                    F();
+                }
             } else {
-                check('/');
-                F();
+                debug("T --> F");
             }
+        } else {
+            yyError("Expected: '(', identifier or number");
         }
     }
 
     private void F() {
-        if (laToken == IDENT || laToken == NUM) {
-            check(laToken);
+        if (laToken == IDENT) {
+            debug("F --> IDENT");
+
+            check(IDENT);
+        } else if (laToken == NUM) {
+            debug("F --> NUM");
+
+            check(NUM);
         } else if (laToken == '(') {
+            debug("F --> ( E )");
+
             check('(');
             E();
             check(')');
         } else {
-            yyError("Expected '(', or ,Identifier or Number");
+            yyError("Esperado operando (, identificador ou numero");
         }
     }
 
@@ -275,7 +308,7 @@ public class AsdrSample {
 
             laStr = ((laToken < BASE_TOKEN_NUM) ? Character.toString(laToken) : tokenList[laToken - BASE_TOKEN_NUM]);
 
-            yyError("Expected: '" + expStr + "', actual: '" + laStr + "'.");
+            yyError("esperado token: " + expStr + " na entrada: " + laStr);
         }
     }
 
@@ -284,14 +317,14 @@ public class AsdrSample {
         try {
             retVal = lexer.yylex();
         } catch (IOException e) {
-            System.err.println("IO Error: " + e);
+            System.err.println("IO Error:" + e);
         }
         return retVal;
     }
 
     public void yyError(String error) {
         System.err.println("Error: " + error);
-        System.err.println("Entry rejected");
+        System.err.println("Rejected");
         System.out.println("\n\nFAILED!");
 
         System.exit(1);
@@ -308,29 +341,25 @@ public class AsdrSample {
      * It prints debugging information about each returned token to
      * System.out until the end of file is reached, or an error occured.
      *
-     * @param args the command line, contains the filenames to run the scanner on.
+     * @param args the command line, contains the filenames to run
+     *             the scanner on.
      */
     public static void main(String[] args) {
         AsdrSample parser;
         try {
-            if (args.length == 0) {
-                parser = new AsdrSample(new InputStreamReader(System.in));
-            } else {
-                parser = new AsdrSample(new java.io.FileReader(args[0]));
-            }
+            if (args.length == 0) parser = new AsdrSample(new InputStreamReader(System.in));
+            else parser = new AsdrSample(new java.io.FileReader(args[0]));
 
-            parser.setDebug(true);
+            parser.setDebug(false);
+
             laToken = parser.yyLex();
 
             parser.Prog();
 
-            if (laToken == Yylex.YYEOF) {
-                System.out.println("\n\nSUCCESS!");
-            } else {
-                System.out.println("\n\nFAILED - Expected EOF");
-            }
+            if (laToken == Yylex.YYEOF) System.out.println("\n\nSUCCESS");
+            else System.out.println("\n\nFAILED, expected EOF");
         } catch (java.io.FileNotFoundException e) {
-            System.out.println("File not found: \"" + args[0] + "\"");
+            System.out.println("File not found : \"" + args[0] + "\"");
         }
     }
 }

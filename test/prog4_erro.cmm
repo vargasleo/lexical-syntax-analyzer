@@ -8,7 +8,7 @@ func int foo(int i, int j) {
 
 int i, j;
 
-func void src.main() {
+func void main() {
     boolean ok;
 
 

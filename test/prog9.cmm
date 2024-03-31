@@ -1,0 +1,3 @@
+func int Test (int a, int b){
+    a = 1.5 + 1.6;
+}
